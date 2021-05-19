@@ -57,6 +57,9 @@ public class PreprocessingManager {
 
         LABEL = label;
 
+        File out = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename);
+        if(out.exists())
+            written_header = true;
     }
 
     private void check_window(long time) {
