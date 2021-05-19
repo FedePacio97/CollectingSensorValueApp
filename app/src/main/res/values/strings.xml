@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">SensorTrial</string>
+    <string name="app_name">CollectingSensorValueApp</string>
+    <string name="select_training">Click on one of the following button
+        to produce data for the related category</string>
+
+    <string name="push_ups_group">Push-ups</string>
+    <string name="fast_push_ups_select_training">Fast</string>
+    <string name="slow_push_ups_select_training">Slow</string>
+    <string name="normal_push_ups_select_training">Normal</string>
+    <string name="half_top_push_ups_select_training">Half-top</string>
+    <string name="half_bottom_push_ups_select_training">Half-bottom</string>
+    <string name="lower_body_push_ups_select_training">Lower-body</string>
+    <string name="upper_body_push_ups_select_training">Upper-body</string>
 </resources>

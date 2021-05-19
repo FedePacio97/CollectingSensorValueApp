@@ -11,8 +11,19 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.Image;
+import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+
+import org.w3c.dom.Text;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -30,6 +41,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     private final int WINDOW = 5000000; //Us //5s
 
     private PreprocessingManager preprocessingManager;
+
+    private final int COUNTDOWN_BEFORE_STARTING = 5000; //ms
+    private final int RECORDING_PERIOD = 21000; //ms = 21 sec
 
 
     @Override
@@ -59,14 +73,133 @@ public class MainActivity extends Activity implements SensorEventListener {
             //ABORT!
         }
 
-        preprocessingManager = new PreprocessingManager(context,WINDOW,SAMPLING_RATE);
+        //Wait for user input
+        ImageView type_of_exercise_image = findViewById(R.id.push_ups_type);
+        final Button button_fast = findViewById(R.id.fast);
+        button_fast.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Code here executes on main thread after user presses button
+
+                type_of_exercise_image.setImageResource(R.drawable.normal_push_ups);
+
+                //start activity
+                startActivityProcedure("fast_push_ups");
+            }
+        });
+
+        final Button button_normal = findViewById(R.id.normal_speed);
+        button_normal.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Code here executes on main thread after user presses button
+
+                type_of_exercise_image.setImageResource(R.drawable.normal_push_ups);
+
+                //start activity
+                startActivityProcedure("normal_push_ups");
+            }
+        });
+
+        final Button button_slow = findViewById(R.id.slow);
+        button_slow.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Code here executes on main thread after user presses button
+
+                type_of_exercise_image.setImageResource(R.drawable.normal_push_ups);
+
+                //start activity
+                startActivityProcedure("slow_push_ups");
+            }
+        });
+
+
+        final Button button_half_top = findViewById(R.id.half_top);
+        button_half_top.setOnClickListener(v -> {
+            // Code here executes on main thread after user presses button
+
+            type_of_exercise_image.setImageResource(R.drawable.half_top_push_ups);
+
+            //start activity
+            startActivityProcedure("half_top_push_ups");
+        });
+
+        final Button button_half_bottom = findViewById(R.id.half_bottom);
+        button_half_bottom.setOnClickListener(v -> {
+            // Code here executes on main thread after user presses button
+
+            type_of_exercise_image.setImageResource(R.drawable.half_bottom_push_ups);
+
+            //start activity
+            startActivityProcedure("half_bottom_push_ups");
+        });
+
+        final Button button_upper_body = findViewById(R.id.upper_body);
+        button_upper_body.setOnClickListener(v -> {
+            // Code here executes on main thread after user presses button
+
+            type_of_exercise_image.setImageResource(R.drawable.upper_body_push_ups);
+
+            //start activity
+            startActivityProcedure("upper_body_push_ups");
+        });
+
+        final Button button_lower_body = findViewById(R.id.lower_body);
+        button_lower_body.setOnClickListener(v -> {
+            // Code here executes on main thread after user presses button
+
+            type_of_exercise_image.setImageResource(R.drawable.lower_body_push_ups);
+
+            //start activity
+            startActivityProcedure("lower_body_push_ups");
+        });
+
+    }
+
+    private void startActivityProcedure(String type_of_exercise) {
+
+        EditText countdown_number = findViewById(R.id.countdown);
+
+        CountDownTimer samplingActivityCountDown = new CountDownTimer(RECORDING_PERIOD, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                countdown_number.setText(String.valueOf(millisUntilFinished / 1000));
+            }
+
+            @Override
+            public void onFinish() {
+                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                toneGen1.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT,500);
+
+                stopCollectingData();
+            }
+        };
+
+        new CountDownTimer(COUNTDOWN_BEFORE_STARTING, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                countdown_number.setText(String.valueOf(millisUntilFinished / 1000));
+                //Make a bip
+                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
+            }
+
+            public void onFinish() {
+                countdown_number.setText("START");
+                //Make a longer bip
+                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                toneGen1.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT,150);
+
+                //START RECORDING ACTIVITY
+                startCollectingData(type_of_exercise);
+                samplingActivityCountDown.start();
+            }
+        }.start();
+
     }
 
     protected void onResume() {
+        //Called also when app is launched at first time
         super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SAMPLING_RATE);
-        mSensorManager.registerListener(this, mRotationVector, SAMPLING_RATE);
-        mSensorManager.registerListener(this, mGyroscope, SAMPLING_RATE);
+
     }
 
     protected void onPause() {
@@ -79,6 +212,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         //preprocessingManager.export_csv();
     }
 
+    @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         String sensorName = sensorEvent.sensor.getName();
 
@@ -92,11 +226,47 @@ public class MainActivity extends Activity implements SensorEventListener {
             preprocessingManager.log_orientation(sensorEvent.timestamp,
                     sensorEvent.values[0],sensorEvent.values[1],sensorEvent.values[2]);
 
-        //Log.d("Debug","[" + sensorEvent.timestamp + "]" + sensorName + ": X: " + sensorEvent.values[0] + "; Y: " + sensorEvent.values[1] + "; Z: " + sensorEvent.values[2] + ";");
+        Log.d("Debug","[" + sensorEvent.timestamp + "]" + sensorName + ": X: " + sensorEvent.values[0] + "; Y: " + sensorEvent.values[1] + "; Z: " + sensorEvent.values[2] + ";");
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         Log.d("Debug","accuracy" + accuracy);
+    }
+
+    public void startCollectingData(String type_of_exercise){
+        /*mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        mRotationVector = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+        context = getApplicationContext();
+
+        requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE}, 1);
+        if (ContextCompat.checkSelfPermission(
+                context, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            // You can use the API that requires the permission.
+            //ABORT!
+        }
+
+        if (ContextCompat.checkSelfPermission(
+                context, Manifest.permission.READ_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            // You can use the API that requires the permission.
+            //ABORT!
+        }*/
+
+        preprocessingManager = new PreprocessingManager(context,WINDOW,SAMPLING_RATE,type_of_exercise);
+
+        //start collecting data
+        mSensorManager.registerListener(this, mAccelerometer, SAMPLING_RATE);
+        mSensorManager.registerListener(this, mRotationVector, SAMPLING_RATE);
+        mSensorManager.registerListener(this, mGyroscope, SAMPLING_RATE);
+    }
+
+    public void stopCollectingData(){
+
+        mSensorManager.unregisterListener(this);
     }
 
 
