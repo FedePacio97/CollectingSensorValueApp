@@ -23,7 +23,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.example.wekamanager.WekaManager;
 import org.w3c.dom.Text;
+import weka.classifiers.Classifier;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -205,6 +207,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     protected void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(this);
+        Classifier c = WekaManager.loadClassifier(getResources().openRawResource(R.raw.default_model));
+        Log.d("classify", WekaManager.classify(c, getResources().openRawResource(R.raw.unlabeled)).toString());
     }
 
     protected void onStop() {
