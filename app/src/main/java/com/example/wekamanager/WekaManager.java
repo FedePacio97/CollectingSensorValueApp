@@ -167,6 +167,11 @@ public class WekaManager {
         }
     }
 
+    public static String classify(Classifier cl, Double[] samples) {
+        Instances inst = buildInstances(samples);
+        return classify(cl, inst);
+    }
+
     private static Instances addLabel(Instances unlabeled) {
         try {
             // add class nominal attribute
@@ -204,7 +209,7 @@ public class WekaManager {
         return  attributes;
     }
 
-    public Instances buildInstances(Double[] values) {
+    public static Instances buildInstances(Double[] values) {
 
         ArrayList<Attribute> attributes = new ArrayList<>();
 
@@ -215,7 +220,7 @@ public class WekaManager {
         }
 
         //add label attribute
-        Attribute lab = new Attribute("label", Arrays.asList(ATTRIBUTE_NAMES));
+        Attribute lab = new Attribute("label", Arrays.asList(CLASSES));
         attributes.add(lab);
 
         Instances res = new Instances("sampleWindow", attributes, 1);
