@@ -101,6 +101,7 @@ public class PreprocessingManager {
             PrintWriter pw = new PrintWriter(fileWriter);
             pw.println(header);
             pw.flush();
+            pw.close();
             //to debug
             Log.d("CSV_header", header);
         } catch (Exception e) {
@@ -194,7 +195,7 @@ public class PreprocessingManager {
         }
 
         File out = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename);
-        //Log.d("path",Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+        Log.d("path",Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
 
         try (FileWriter fileWriter = new FileWriter(out, true)) {
             PrintWriter pw = new PrintWriter(fileWriter);
@@ -211,6 +212,7 @@ public class PreprocessingManager {
 
             pw.println(String.join(",", row));
             pw.flush();
+            pw.close();
             //to debug
             Log.d("CSV", String.join(",", row));
 
