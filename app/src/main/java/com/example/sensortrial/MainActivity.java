@@ -23,7 +23,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.example.wekamanager.WekaManager;
 import org.w3c.dom.Text;
+import weka.classifiers.Classifier;
+import weka.core.Instances;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -205,6 +208,14 @@ public class MainActivity extends Activity implements SensorEventListener {
     protected void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(this);
+        Classifier c = WekaManager.loadClassifier(getResources().openRawResource(R.raw.default_model));
+        //Log.d("classify", WekaManager.classify(c, getResources().openRawResource(R.raw.unlabeled)).toString());
+        /*
+        Double[] sample = {-9.421097861,-9.330559731,-8.719779968,-8.464389801,-10.30920029,1.844810486,0.372928528,9.428476049,0.0,1.0,0.94788093,0.911319017,1.131260037,1.49890995,0.650399029,0.848510921,0.130205893,0.956782019,0.0,1.0,-2.91955052,-2.888979912,-2.699860096,-2.620790005,-3.191930056,0.571140051,0.1181906,2.921941864,
+                0.0,63.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.611610651,0.611610651,0.611610651,0.611610651,0.611610651,0.0,0.0,0.611610651,0.0,1.0,0.522665441,0.522665441,0.522665441,0.522665441,0.522665441,0.0,0.0,0.522665441,0.0,63.0,-0.411872119,-0.411872119,-0.411872119,-0.411872119,-0.411872119,0.0,0.0,0.411872119,0.0,1.0};
+        Log.d("classify", WekaManager.classify(c, sample));
+
+         */ //DEBUG
     }
 
     protected void onStop() {
